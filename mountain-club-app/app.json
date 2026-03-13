@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "이카산악회",
+    "slug": "icca-mountain-club",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1a5c2e"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.icca.mountainclub",
+      "infoPlist": {
+        "NSCameraUsageDescription": "등산 사진 촬영을 위해 카메라 접근이 필요합니다.",
+        "NSPhotoLibraryUsageDescription": "갤러리에 사진을 저장하거나 불러오기 위해 사진 라이브러리 접근이 필요합니다.",
+        "NSLocationWhenInUseUsageDescription": "현재 위치 기반 날씨 정보를 위해 위치 접근이 필요합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1a5c2e"
+      },
+      "package": "com.icca.mountainclub",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-camera",
+      "expo-image-picker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1a5c2e"
+        }
+      ]
+    ]
+  }
+}

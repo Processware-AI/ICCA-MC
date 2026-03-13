@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 인증된 사용자만 읽기 허용 함수
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 관리자 확인 함수
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipLevel == 'admin';
+    }
+
+    // 본인 확인 함수
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // 사용자 컬렉션
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 이벤트 컬렉션
+    match /events/{eventId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAuthenticated(); // 참가 신청을 위해 업데이트 허용
+      allow delete: if isAdmin();
+    }
+
+    // 공지사항 컬렉션
+    match /notices/{noticeId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 결제 컬렉션
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAdmin() || isOwner(resource.data.userId);
+      allow delete: if isAdmin();
+    }
+
+    // 갤러리 컬렉션
+    match /gallery/{photoId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated(); // 좋아요를 위한 업데이트 허용
+      allow delete: if isAdmin() || (isAuthenticated() && resource.data.uploadedById == request.auth.uid);
+    }
+  }
+}

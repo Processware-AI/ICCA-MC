@@ -1,0 +1,23 @@
+node_modules/
+.expo/
+dist/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+.env
+.env.local
+
+# macOS
+.DS_Store
+
+# TypeScript
+*.tsbuildinfo
+
+# Firebase
+.firebase/
+firebase-debug.log

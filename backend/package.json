@@ -1,0 +1,19 @@
+{
+  "name": "icca-mountain-club-backend",
+  "version": "1.0.0",
+  "description": "이카산악회 앱 백엔드 서버 (결제 처리)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "stripe": "^14.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
