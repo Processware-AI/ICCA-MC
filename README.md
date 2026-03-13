@@ -1,6 +1,13 @@
-# 이카산악회 (ICCA Mountain Club) 앱
+# 이카산악회 (ICCA Mountain Club)
 
-iOS와 Android에서 동작하는 산악회 회원 관리 앱입니다.
+iOS/Android 앱과 웹 서비스로 동작하는 산악회 회원 관리 시스템입니다.
+
+## 플랫폼
+
+| 플랫폼 | 디렉토리 | 기술 |
+|--------|---------|------|
+| 📱 **모바일 앱** | `mountain-club-app/` | React Native + Expo |
+| 🌐 **웹 서비스** | `web-app/` | Next.js 14 + Tailwind CSS |
 
 ## 기능
 
@@ -110,7 +117,24 @@ npm start
 - **결제 수단:** 신용카드, 카카오페이, 네이버페이, 토스페이
 - **환불:** 영업일 3~5일 소요
 
-## 배포 (EAS Build)
+## 웹 서비스 시작하기
+
+```bash
+cd web-app
+npm install
+cp .env.example .env.local  # Firebase + Stripe 키 입력
+npm run dev   # http://localhost:3000
+npm run build # 프로덕션 빌드
+```
+
+### 웹 서비스 배포 (Vercel 권장)
+
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+## 모바일 앱 배포 (EAS Build)
 
 ```bash
 npm install -g eas-cli
