@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인천상공회의소 CEO아카데미 총동문회 산악동호회 2026</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- ========== HERO SECTION ========== -->
+  <section class="hero" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+      <p class="hero-badge fade-up">EST. 2026 MOUNTAINEERING CLUB</p>
+      <h1 class="hero-title fade-up delay-1">
+        <span class="title-line">인천상공회의소</span>
+        <span class="title-line accent">CEO아카데미 총동문회</span>
+        <span class="title-line">산악동호회</span>
+      </h1>
+      <p class="hero-subtitle fade-up delay-2">산이 우리를 부를 때, 함께 오르는 사람들</p>
+      <div class="hero-scroll fade-up delay-3">
+        <span>아래로 스크롤</span>
+        <div class="scroll-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== NAV (sticky after scroll) ========== -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo"><img src="images/logo.jpg" alt="인천상공회의소" style="height:32px;"> 산악동호회</a>
+      <div class="nav-links">
+        <a href="#greeting">회장 인사말</a>
+        <a href="#leaders">총동문회 인사말</a>
+        <a href="#executives">집행부</a>
+        <a href="#hiking">정기산행</a>
+        <a href="#hiking-results">산행결과</a>
+        <a href="#events">행사안내</a>
+        <a href="#event-results">행사결과</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========== 1. 회장 인사말 ========== -->
+  <section class="section section-greeting" id="greeting">
+    <div class="container">
+      <div class="section-label fade-up">01</div>
+      <h2 class="section-title fade-up">회장 인사말</h2>
+      <div class="greeting-card fade-up delay-1" onclick="location.href='pages/greeting.html'">
+        <div class="greeting-image">
+          <div class="image-placeholder president">
+            <!-- 회장님 사진으로 교체: src="images/president.jpg" -->
+            <img src="images/president.jpg" alt="회장 프로필" onerror="this.style.display='none'">
+            <div class="placeholder-text">회장<br>사진</div>
+          </div>
+          <div class="image-glow"></div>
+        </div>
+        <div class="greeting-text">
+          <span class="greeting-role">2026 산악동호회 회장</span>
+          <h3 class="greeting-name">최종식</h3>
+          <p class="greeting-message">
+            안녕하십니까, 인천상공회의소 CEO아카데미 총동문회 산악동호회 회장 최종식입니다.
+            2026년에도 회원 여러분과 함께 아름다운 산행을 이어가며, 건강과 우정을 나누는 한 해가 되기를 바랍니다.
+            자연 속에서 함께하는 시간이 우리 모두에게 큰 힘이 되길 기원합니다.
+          </p>
+          <span class="card-link">자세히 보기 →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 1-2. 총동문회 회장 & 산악트레킹 총괄회장 ========== -->
+  <section class="section section-leaders" id="leaders">
+    <div class="container">
+      <div class="section-label fade-up">02</div>
+      <h2 class="section-title fade-up">총동문회 인사말</h2>
+      <p class="section-desc fade-up">총동문회를 이끌어주시는 분들의 인사 말씀입니다</p>
+      <div class="leaders-grid">
+
+        <!-- 총동문회 회장 -->
+        <div class="leader-card fade-up delay-1" onclick="location.href='pages/leaders.html#alumni-president'">
+          <div class="leader-image">
+            <div class="image-placeholder president" style="width:160px; height:160px;">
+              <img src="images/alumni-president.jpg" alt="총동문회 회장 프로필" onerror="this.style.display='none'">
+              <div class="placeholder-text">총동문회<br>회장 사진</div>
+            </div>
+          </div>
+          <div class="leader-info">
+            <span class="greeting-role">CEO아카데미 총동문회 회장</span>
+            <h3 class="greeting-name" style="font-size:1.4rem;">이헌구</h3>
+            <p class="greeting-message">
+              총동문회 회원 여러분, 안녕하십니까. 산악동호회의 활발한 활동을 응원하며,
+              회원 여러분의 건강과 화합을 기원합니다.
+            </p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+
+        <!-- 총동문회 산악트레킹 총괄회장 -->
+        <div class="leader-card fade-up delay-2" onclick="location.href='pages/leaders.html#trekking-president'">
+          <div class="leader-image">
+            <div class="image-placeholder president" style="width:160px; height:160px;">
+              <img src="images/trekking-president.jpg" alt="산악트레킹 총괄회장 프로필" onerror="this.style.display='none'">
+              <div class="placeholder-text">총괄회장<br>사진</div>
+            </div>
+          </div>
+          <div class="leader-info">
+            <span class="greeting-role">산악트레킹 총괄회장</span>
+            <h3 class="greeting-name" style="font-size:1.4rem;">길경식</h3>
+            <p class="greeting-message">
+              산악트레킹을 사랑하는 동문 여러분, 안녕하십니까.
+              올해도 안전하고 즐거운 산행으로 함께하겠습니다.
+            </p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3. 주요 집행부 ========== -->
+  <section class="section section-executives" id="executives">
+    <div class="container">
+      <div class="section-label fade-up">03</div>
+      <h2 class="section-title fade-up">주요 집행부</h2>
+      <p class="section-desc fade-up">2026년 산악동호회를 이끌어갈 집행부를 소개합니다</p>
+      <div class="exec-grid">
+        <!-- 산악대장 -->
+        <div class="exec-card fade-up delay-1" onclick="location.href='pages/executives.html#leader'">
+          <div class="exec-image-wrap">
+            <div class="image-placeholder exec">
+              <img src="images/exec-leader.jpg" alt="산악대장 프로필" onerror="this.style.display='none'">
+              <div class="placeholder-text">산악대장<br>사진</div>
+            </div>
+          </div>
+          <div class="exec-info">
+            <span class="exec-role">산악대장</span>
+            <h3 class="exec-name">김경택</h3>
+            <p class="exec-message">안전하고 즐거운 산행을 약속드립니다. 2026년에도 멋진 코스로 여러분을 안내하겠습니다.</p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+        <!-- 사무국장 -->
+        <div class="exec-card fade-up delay-2" onclick="location.href='pages/executives.html#secretary'">
+          <div class="exec-image-wrap">
+            <div class="image-placeholder exec">
+              <img src="images/exec-secretary.jpg" alt="사무국장 프로필" onerror="this.style.display='none'">
+              <div class="placeholder-text">사무국장<br>사진</div>
+            </div>
+          </div>
+          <div class="exec-info">
+            <span class="exec-role">사무국장</span>
+            <h3 class="exec-name">방명환</h3>
+            <p class="exec-message">원활한 동호회 운영을 위해 최선을 다하겠습니다. 언제든 편하게 연락 주세요.</p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+        <!-- 재무국장 -->
+        <div class="exec-card fade-up delay-3" onclick="location.href='pages/executives.html#finance'">
+          <div class="exec-image-wrap">
+            <div class="image-placeholder exec">
+              <img src="images/exec-finance.jpg" alt="재무국장 프로필" onerror="this.style.display='none'">
+              <div class="placeholder-text">재무국장<br>사진</div>
+            </div>
+          </div>
+          <div class="exec-info">
+            <span class="exec-role">재무국장</span>
+            <h3 class="exec-name">장선영</h3>
+            <p class="exec-message">투명한 회계 관리로 회원 여러분의 신뢰에 보답하겠습니다.</p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 4. 정기산행 안내 ========== -->
+  <section class="section section-hiking" id="hiking">
+    <div class="container">
+      <div class="section-label fade-up">04</div>
+      <h2 class="section-title fade-up">2026 정기산행 안내</h2>
+      <p class="section-desc fade-up">매월 정기산행 일정을 확인하고, 참석 여부를 알려주세요</p>
+      <div class="hiking-grid">
+
+        <div class="hiking-card hiking-completed fade-up" onclick="location.href='pages/hiking-schedule.html#jan'">
+          <div class="hiking-thumb"><img src="images/hiking-jan.jpg" alt="태기산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month completed">1월</div>
+            <div class="hiking-detail">
+              <h4>태기산 (횡성)</h4>
+              <p>2026.01.17 (토)</p>
+              <span class="hiking-status completed">완료</span>
+            </div>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-completed fade-up" onclick="location.href='pages/hiking-schedule.html#feb'">
+          <div class="hiking-thumb"><img src="images/hiking-feb.jpg" alt="태백산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month completed">2월</div>
+            <div class="hiking-detail">
+              <h4>태백산 (태백)</h4>
+              <p>2026.02.21 (토)</p>
+              <span class="hiking-status completed">완료</span>
+            </div>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-completed fade-up" onclick="location.href='pages/hiking-schedule.html#mar'">
+          <div class="hiking-thumb"><img src="images/hiking-mar.jpg" alt="소래산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month completed">3월</div>
+            <div class="hiking-detail">
+              <h4>소래산 (시산제)</h4>
+              <p>2026.03.14 (토)</p>
+              <span class="hiking-status completed">완료</span>
+            </div>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="hiking-card fade-up" onclick="location.href='pages/hiking-schedule.html#apr'">
+          <div class="hiking-thumb"><img src="images/hiking-apr.jpg" alt="가야산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month">4월</div>
+            <div class="hiking-detail">
+              <h4>가야산 (충남)</h4>
+              <p>2026.04.18 (토)</p>
+              <span class="hiking-status upcoming">예정</span>
+            </div>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-may.jpg" alt="관음봉" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">5월</div>
+            <div class="hiking-detail">
+              <h4>관음봉 (전북 부안)</h4>
+              <p>2026.05.16 (토)</p>
+              <span class="hiking-status disabled">예정</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-jun.jpg" alt="워크숍" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">6월</div>
+            <div class="hiking-detail">
+              <h4>워크숍 (강원/설악/속초)</h4>
+              <p>2026.06.19 (금) ~ 06.20 (토)</p>
+              <span class="hiking-status disabled">워크숍</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-jul.jpg" alt="유명산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">7월</div>
+            <div class="hiking-detail">
+              <h4>유명산 (가평)</h4>
+              <p>2026.07.18 (토)</p>
+              <span class="hiking-status disabled">예정</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-aug.jpg" alt="백두산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">8월</div>
+            <div class="hiking-detail">
+              <h4>백두산 (중국)</h4>
+              <p>2026.08.27 (목) ~</p>
+              <span class="hiking-status disabled">해외산행</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-sep.jpg" alt="민주지산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">9월</div>
+            <div class="hiking-detail">
+              <h4>민주지산 (충북 영동)</h4>
+              <p>2026.09.19 (토)</p>
+              <span class="hiking-status disabled">예정</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-oct.jpg" alt="설악산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">10월</div>
+            <div class="hiking-detail">
+              <h4>설악산 (흘림골)</h4>
+              <p>2026.10.17 (토)</p>
+              <span class="hiking-status disabled">예정</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-nov.jpg" alt="속리산" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">11월</div>
+            <div class="hiking-detail">
+              <h4>속리산 (보은)</h4>
+              <p>2026.11.21 (토)</p>
+              <span class="hiking-status disabled">예정</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hiking-card hiking-disabled fade-up">
+          <div class="hiking-thumb"><img src="images/hiking-dec.jpg" alt="송년산행" onerror="this.style.display='none'"></div>
+          <div class="hiking-card-body">
+            <div class="hiking-month disabled">12월</div>
+            <div class="hiking-detail">
+              <h4>송년산행 / 송년회</h4>
+              <p>2026.12.19 (토)</p>
+              <span class="hiking-status disabled">송년</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="section-cta fade-up">
+        <a href="https://forms.gle/vRHjawzvRT71AjRK8" target="_blank" class="btn btn-primary">
+          <span>4월 정기산행 참석 여부 설문 응답하기</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 5. 정기산행 결과 ========== -->
+  <section class="section section-results" id="hiking-results">
+    <div class="container">
+      <div class="section-label fade-up">05</div>
+      <h2 class="section-title fade-up">2026 정기산행 결과</h2>
+      <p class="section-desc fade-up">함께한 산행의 기록과 재무 보고</p>
+      <div class="results-grid">
+
+        <div class="result-card fade-up" onclick="location.href='pages/hiking-results.html#jan'">
+          <div class="result-photo">
+            <img src="images/result-jan-group.jpg" alt="1월 단체사진" onerror="this.style.display='none'">
+          </div>
+          <div class="result-body">
+            <div class="result-header">
+              <span class="result-month">1월 산행 · 제230차</span>
+              <span class="result-badge completed">완료</span>
+            </div>
+            <h4>태기산 눈꽃산행 (횡성)</h4>
+            <div class="result-stats">
+              <div class="stat">
+                <span class="stat-num">37</span>
+                <span class="stat-label">참석인원</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">274</span>
+                <span class="stat-label">총지출(만원)</span>
+              </div>
+            </div>
+            <p class="result-review">정회원 35명 + 게스트 2명 참석. 눈꽃이 만개한 태기산에서 뜻깊은 새해 첫 산행을 함께했습니다.</p>
+            <span class="card-link">상세 보기 →</span>
+          </div>
+        </div>
+
+        <div class="result-card fade-up" onclick="location.href='pages/hiking-results.html#feb'">
+          <div class="result-photo">
+            <img src="images/result-feb-group.jpg" alt="2월 단체사진" onerror="this.style.display='none'">
+          </div>
+          <div class="result-body">
+            <div class="result-header">
+              <span class="result-month">2월 산행 · 제231차</span>
+              <span class="result-badge completed">완료</span>
+            </div>
+            <h4>태백산 눈꽃산행 (태백)</h4>
+            <div class="result-stats">
+              <div class="stat">
+                <span class="stat-num">60</span>
+                <span class="stat-label">참석인원</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">489</span>
+                <span class="stat-label">총지출(만원)</span>
+              </div>
+            </div>
+            <p class="result-review">버스 2대로 출발한 태백산 눈꽃산행. 이헌구 총동문회장님 외 다수 회원의 찬조로 풍성한 산행이었습니다.</p>
+            <span class="card-link">상세 보기 →</span>
+          </div>
+        </div>
+
+        <!-- 추가 월별 결과는 pages/hiking-results.html에서 확인 -->
+      </div>
+      <div class="section-cta fade-up">
+        <a href="pages/hiking-results.html" class="btn btn-outline">전체 산행 결과 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 6. 행사 안내 ========== -->
+  <section class="section section-events" id="events">
+    <div class="container">
+      <div class="section-label fade-up">06</div>
+      <h2 class="section-title fade-up">2026 행사 안내</h2>
+      <p class="section-desc fade-up">산악동호회 특별 행사 일정을 확인해주세요</p>
+      <div class="events-grid">
+
+        <!-- 1. 통합 시산제 -->
+        <div class="event-card fade-up" onclick="location.href='pages/events.html#sisanje'">
+          <div class="event-image">
+            <div class="image-placeholder event">
+              <img src="images/event-sisanje.jpg" alt="통합 시산제" onerror="this.style.display='none'">
+              <div class="placeholder-text">통합 시산제<br>사진</div>
+            </div>
+          </div>
+          <div class="event-info">
+            <span class="event-date">2026.03.14 (토)</span>
+            <h4>총동문회 주관 통합 시산제</h4>
+            <p>총동문회와 산악동호회가 함께하는 2026년 안전산행 기원 통합 시산제를 거행합니다.</p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+
+        <!-- 2. 워크숍 -->
+        <div class="event-card fade-up" onclick="location.href='pages/events.html#workshop'">
+          <div class="event-image">
+            <div class="image-placeholder event">
+              <img src="images/event-workshop.jpg" alt="워크숍" onerror="this.style.display='none'">
+              <div class="placeholder-text">워크숍<br>사진</div>
+            </div>
+          </div>
+          <div class="event-info">
+            <span class="event-date">2026.06.19 (금) ~ 20 (토)</span>
+            <h4>2026 산악동호회 워크숍 (1박 2일)</h4>
+            <p>강원 설악/속초에서 산행과 친목을 겸한 1박 2일 워크숍을 진행합니다.</p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+
+        <!-- 3. 백두산 특별여행 -->
+        <div class="event-card fade-up" onclick="location.href='pages/events.html#baekdu'">
+          <div class="event-image">
+            <div class="image-placeholder event">
+              <img src="images/event-baekdu.jpg" alt="백두산 특별여행" onerror="this.style.display='none'">
+              <div class="placeholder-text">백두산<br>특별여행</div>
+            </div>
+          </div>
+          <div class="event-info">
+            <span class="event-date">2026.08.27 (목) ~ 29 (토)</span>
+            <h4>백두산 특별여행 (2박 3일)</h4>
+            <p>민족의 영산 백두산 천지를 함께 오르는 특별한 해외 산행입니다.</p>
+            <span class="card-link">자세히 보기 →</span>
+          </div>
+        </div>
+
+        <!-- 4. 대청도 비박 번개여행 (비활성) -->
+        <div class="event-card event-disabled fade-up">
+          <div class="event-image">
+            <div class="image-placeholder event">
+              <img src="images/event-daecheong.jpg" alt="대청도 비박" onerror="this.style.display='none'">
+              <div class="placeholder-text">대청도<br>비박여행</div>
+            </div>
+          </div>
+          <div class="event-info">
+            <span class="event-date">2026.10월 경 (1박 2일)</span>
+            <h4>대청도 비박 번개여행</h4>
+            <p>서해 최북단 섬 대청도에서 별빛 아래 비박과 트레킹을 즐기는 특별 여행입니다.</p>
+          </div>
+        </div>
+
+        <!-- 5. 지리산 특별산행 (비활성) -->
+        <div class="event-card event-disabled fade-up">
+          <div class="event-image">
+            <div class="image-placeholder event">
+              <img src="images/event-jirisan.jpg" alt="지리산 특별산행" onerror="this.style.display='none'">
+              <div class="placeholder-text">지리산<br>특별산행</div>
+            </div>
+          </div>
+          <div class="event-info">
+            <span class="event-date">2026.11월 경 (1박 2일)</span>
+            <h4>지리산 특별산행 (1박 2일)</h4>
+            <p>대한민국 최고봉 지리산 천왕봉 종주를 목표로 한 특별 산행입니다.</p>
+          </div>
+        </div>
+
+        <!-- 6. 송년회 (비활성) -->
+        <div class="event-card event-disabled fade-up">
+          <div class="event-image">
+            <div class="image-placeholder event">
+              <img src="images/event-yearend.jpg" alt="송년회" onerror="this.style.display='none'">
+              <div class="placeholder-text">송년회</div>
+            </div>
+          </div>
+          <div class="event-info">
+            <span class="event-date">2026.12.19 (토)</span>
+            <h4>2026 송년회 및 시상식</h4>
+            <p>한 해를 마무리하며 우수 회원 시상, 연간 결산 보고 및 송년 만찬을 개최합니다.</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="section-cta fade-up">
+        <a href="pages/events.html#workshop" class="btn btn-primary">
+          <span>행사 참석 여부 응답하기</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 7. 행사 결과 ========== -->
+  <section class="section section-event-results" id="event-results">
+    <div class="container">
+      <div class="section-label fade-up">07</div>
+      <h2 class="section-title fade-up">2026 행사 결과</h2>
+      <p class="section-desc fade-up">함께한 행사의 소중한 순간들</p>
+      <div class="gallery-grid">
+
+        <div class="gallery-card fade-up" onclick="location.href='pages/event-results.html#sisanje'">
+          <div class="gallery-image">
+            <div class="image-placeholder gallery">
+              <img src="images/result-sisanje-1.jpg" alt="시산제 사진" onerror="this.style.display='none'">
+              <div class="placeholder-text">시산제<br>결과 사진</div>
+            </div>
+            <div class="gallery-overlay">
+              <span>자세히 보기</span>
+            </div>
+          </div>
+          <div class="gallery-info">
+            <span class="gallery-date">2026.03.14</span>
+            <h4>총동문회 주관 통합 시산제</h4>
+            <p>행사 후기가 등록되면 여기에 표시됩니다.</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="section-cta fade-up">
+        <a href="pages/event-results.html" class="btn btn-outline">전체 행사 결과 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 8. 캘린더 ========== -->
+  <section class="section section-calendar" id="calendar">
+    <div class="container">
+      <div class="section-label fade-up">08</div>
+      <h2 class="section-title fade-up">2026 산악동호회 캘린더</h2>
+      <p class="section-desc fade-up">월별 일정을 한눈에 확인하세요</p>
+      <div class="calendar-wrap fade-up">
+        <div class="calendar-header">
+          <button class="calendar-nav" id="calPrev">◀</button>
+          <h3 class="calendar-month-title" id="calTitle"></h3>
+          <button class="calendar-nav" id="calNext">▶</button>
+        </div>
+        <div class="calendar-grid">
+          <div class="calendar-day-name">일</div>
+          <div class="calendar-day-name">월</div>
+          <div class="calendar-day-name">화</div>
+          <div class="calendar-day-name">수</div>
+          <div class="calendar-day-name">목</div>
+          <div class="calendar-day-name">금</div>
+          <div class="calendar-day-name">토</div>
+        </div>
+        <div class="calendar-dates" id="calDates"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h3><img src="images/logo.jpg" alt="인천상공회의소" style="height:36px; display:inline-block; vertical-align:middle; margin-right:8px;"> 인천상공회의소 CEO아카데미 총동문회 산악동호회</h3>
+          <p>산이 우리를 부를 때, 함께 오르는 사람들</p>
+        </div>
+        <div class="footer-links">
+          <a href="#greeting">회장 인사말</a>
+          <a href="#executives">집행부 소개</a>
+          <a href="#hiking">정기산행</a>
+          <a href="#events">행사안내</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 인천상공회의소 CEO아카데미 총동문회 산악동호회. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
