@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 — 산악동호회 2026</title>
+  <link rel="icon" href="../images/favicon.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../index.html#hero" class="nav-logo"><img src="../images/icca-mc-logo.png" alt="산악동호회" style="height:40px;"></a>
+      <div class="nav-links">
+        <a href="../index.html#greeting">인사말</a>
+        <a href="../index.html#leaders">총동문회 인사말</a>
+        <a href="../index.html#executives">집행부</a>
+        <a href="../index.html#hiking">정기산행</a>
+        <a href="../index.html#hiking-results">산행결과</a>
+        <a href="../index.html#events">행사안내</a>
+        <a href="../index.html#event-results">행사결과</a>
+      </div>
+      <a href="login.html" class="nav-auth-btn" id="navAuthBtn">로그인</a>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="container">
+      <a href="login.html" class="back-link">← 로그인으로 돌아가기</a>
+      <h1 class="section-title" style="position:relative;z-index:2;">회원가입</h1>
+      <p class="section-desc" style="position:relative;z-index:2;">총동문회 정회원 확인 후 관리자가 승인합니다</p>
+    </div>
+  </section>
+
+  <section class="detail-content">
+    <div class="container">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <h2 class="auth-title">회원가입</h2>
+
+          <div class="auth-notice">
+            <strong>안내</strong>: 가입 후 관리자가 총동문회 정회원 여부를 확인한 뒤 승인합니다.
+            승인 전까지는 회원 전용 기능을 이용할 수 없습니다.
+          </div>
+
+          <div id="signupError" class="auth-error" style="display:none;"></div>
+
+          <form id="signupForm" class="auth-form">
+            <div class="form-group">
+              <label for="name">이름 <span class="required">*</span></label>
+              <input type="text" id="name" name="name" placeholder="실명 입력" required>
+            </div>
+            <div class="form-group">
+              <label for="batch">기수 <span class="required">*</span></label>
+              <input type="text" id="batch" name="batch" placeholder="예: 25기" required>
+            </div>
+            <div class="form-group">
+              <label for="phone">연락처 <span class="required">*</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" required>
+            </div>
+            <div class="form-group">
+              <label for="email">이메일 <span class="required">*</span></label>
+              <input type="email" id="email" name="email" placeholder="이메일 주소 입력" required>
+            </div>
+            <div class="form-group">
+              <label for="password">비밀번호 <span class="required">*</span></label>
+              <input type="password" id="password" name="password" placeholder="6자 이상" minlength="6" required>
+            </div>
+            <div class="form-group">
+              <label for="passwordConfirm">비밀번호 확인 <span class="required">*</span></label>
+              <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="비밀번호 다시 입력" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primary auth-btn" id="signupBtn">가입 신청</button>
+          </form>
+
+          <div class="auth-links">
+            <a href="login.html">이미 계정이 있으신가요? 로그인</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/nav-auth.js"></script>
+  <script src="../js/auth.js"></script>
+
+  <script>
+    const signupForm = document.getElementById('signupForm');
+    const signupError = document.getElementById('signupError');
+    const signupBtn = document.getElementById('signupBtn');
+
+    function showError(msg) {
+      signupError.textContent = msg;
+      signupError.style.display = 'block';
+      signupError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      signupError.style.display = 'none';
+
+      const name = document.getElementById('name').value.trim();
+      const batch = document.getElementById('batch').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+      if (password !== passwordConfirm) {
+        showError('비밀번호가 일치하지 않습니다.');
+        return;
+      }
+
+      signupBtn.disabled = true;
+      signupBtn.textContent = '가입 처리 중...';
+
+      try {
+        await Auth.signup({ email, password, name, batch, phone });
+        alert('가입 신청이 완료되었습니다.\n관리자 승인 후 로그인할 수 있습니다.');
+        location.href = 'login.html';
+      } catch (err) {
+        const messages = {
+          'auth/email-already-in-use': '이미 등록된 이메일입니다.',
+          'auth/invalid-email': '이메일 형식이 올바르지 않습니다.',
+          'auth/weak-password': '비밀번호가 너무 약합니다. 6자 이상 입력해주세요.'
+        };
+        showError(messages[err.code] || '가입에 실패했습니다: ' + err.message);
+      } finally {
+        signupBtn.disabled = false;
+        signupBtn.textContent = '가입 신청';
+      }
+    });
+  </script>
+
+</body>
+</html>

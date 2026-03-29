@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 — 산악동호회 2026</title>
+  <link rel="icon" href="../images/favicon.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../index.html#hero" class="nav-logo"><img src="../images/icca-mc-logo.png" alt="산악동호회" style="height:40px;"></a>
+      <div class="nav-links">
+        <a href="../index.html#greeting">인사말</a>
+        <a href="../index.html#leaders">총동문회 인사말</a>
+        <a href="../index.html#executives">집행부</a>
+        <a href="../index.html#hiking">정기산행</a>
+        <a href="../index.html#hiking-results">산행결과</a>
+        <a href="../index.html#events">행사안내</a>
+        <a href="../index.html#event-results">행사결과</a>
+      </div>
+      <a href="login.html" class="nav-auth-btn" id="navAuthBtn">로그인</a>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="container">
+      <a href="../index.html" class="back-link">← 메인으로 돌아가기</a>
+      <h1 class="section-title" style="position:relative;z-index:2;">로그인</h1>
+      <p class="section-desc" style="position:relative;z-index:2;">회원 서비스를 이용하시려면 로그인해주세요</p>
+    </div>
+  </section>
+
+  <section class="detail-content">
+    <div class="container">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <h2 class="auth-title">로그인</h2>
+
+          <div id="loginError" class="auth-error" style="display:none;"></div>
+
+          <form id="loginForm" class="auth-form">
+            <div class="form-group">
+              <label for="email">이메일</label>
+              <input type="email" id="email" name="email" placeholder="이메일 주소 입력" required>
+            </div>
+            <div class="form-group">
+              <label for="password">비밀번호</label>
+              <input type="password" id="password" name="password" placeholder="비밀번호 입력" required>
+            </div>
+            <button type="submit" class="btn btn-primary auth-btn" id="loginBtn">로그인</button>
+          </form>
+
+          <div class="auth-divider">
+            <span>또는</span>
+          </div>
+
+          <button class="btn auth-btn kakao-btn" id="kakaoLoginBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.48 3 2 6.36 2 10.5c0 2.67 1.78 5.01 4.44 6.35-.14.52-.92 3.37-.96 3.58 0 0-.02.16.08.22.1.06.22.03.22.03.29-.04 3.37-2.21 3.9-2.58.72.1 1.48.15 2.26.15 5.52 0 10-3.36 10-7.5S17.52 3 12 3z"/></svg>
+            카카오 로그인
+          </button>
+
+          <div class="auth-links">
+            <a href="signup.html">회원가입</a>
+            <a href="#" id="resetPwLink">비밀번호 찾기</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/nav-auth.js"></script>
+  <script src="../js/auth.js"></script>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+
+    function showError(msg) {
+      loginError.textContent = msg;
+      loginError.style.display = 'block';
+    }
+
+    // 이메일/비밀번호 로그인
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.style.display = 'none';
+      loginBtn.disabled = true;
+      loginBtn.textContent = '로그인 중...';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        await Auth.login(email, password);
+        location.href = 'mypage.html';
+      } catch (err) {
+        if (err.code === 'auth/not-approved') {
+          showError(err.message);
+        } else {
+          const messages = {
+            'auth/user-not-found': '등록되지 않은 이메일입니다.',
+            'auth/wrong-password': '비밀번호가 올바르지 않습니다.',
+            'auth/invalid-email': '이메일 형식이 올바르지 않습니다.',
+            'auth/too-many-requests': '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.',
+            'auth/invalid-credential': '이메일 또는 비밀번호가 올바르지 않습니다.'
+          };
+          showError(messages[err.code] || '로그인에 실패했습니다: ' + err.message);
+        }
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = '로그인';
+      }
+    });
+
+    // 비밀번호 재설정
+    document.getElementById('resetPwLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        showError('비밀번호를 찾으려면 이메일을 먼저 입력해주세요.');
+        return;
+      }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        alert('비밀번호 재설정 이메일을 발송했습니다.\n이메일을 확인해주세요.');
+      } catch (err) {
+        showError('비밀번호 재설정 이메일 발송에 실패했습니다.');
+      }
+    });
+
+    // 카카오 로그인 (추후 구현)
+    document.getElementById('kakaoLoginBtn').addEventListener('click', () => {
+      alert('카카오 로그인은 준비 중입니다.');
+    });
+
+    // 이미 로그인 상태 + 승인 회원이면 마이페이지로 이동
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const doc = await db.collection('users').doc(user.uid).get();
+          if (doc.exists && doc.data().status === 'approved') {
+            location.href = 'mypage.html';
+          } else {
+            // 승인 안된 상태면 로그아웃
+            await auth.signOut();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

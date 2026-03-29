@@ -17,10 +17,17 @@
       <a href="../index.html#hero" class="nav-logo"><img src="../images/icca-mc-logo.png" alt="인천상공회의소 CEO 아카데미 총동문회 산악동호회" style="height:40px;"></a>
       <div class="nav-links">
         <a href="../index.html#greeting">인사말</a>
+        <a href="../index.html#leaders">총동문회 인사말</a>
         <a href="../index.html#executives">집행부</a>
         <a href="../index.html#hiking">정기산행</a>
+        <a href="../index.html#hiking-results">산행결과</a>
         <a href="../index.html#events">행사안내</a>
+        <a href="../index.html#event-results">행사결과</a>
       </div>
+      <a href="login.html" class="nav-auth-btn" id="navAuthBtn">로그인</a>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
@@ -498,5 +505,12 @@
   </footer>
 
   <script src="../js/main.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/nav-auth.js"></script>
 </body>
 </html>

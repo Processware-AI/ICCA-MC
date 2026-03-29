@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 — 산악동호회 2026</title>
+  <link rel="icon" href="../images/favicon.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../index.html#hero" class="nav-logo"><img src="../images/icca-mc-logo.png" alt="산악동호회" style="height:40px;"></a>
+      <div class="nav-links">
+        <a href="../index.html#greeting">인사말</a>
+        <a href="../index.html#leaders">총동문회 인사말</a>
+        <a href="../index.html#executives">집행부</a>
+        <a href="../index.html#hiking">정기산행</a>
+        <a href="../index.html#hiking-results">산행결과</a>
+        <a href="../index.html#events">행사안내</a>
+        <a href="../index.html#event-results">행사결과</a>
+      </div>
+      <a href="login.html" class="nav-auth-btn" id="navAuthBtn">로그인</a>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="container">
+      <a href="mypage.html" class="back-link">← 마이페이지로 돌아가기</a>
+      <h1 class="section-title" style="position:relative;z-index:2;">관리자 페이지</h1>
+      <p class="section-desc" style="position:relative;z-index:2;">회원 가입 승인 및 관리</p>
+    </div>
+  </section>
+
+  <section class="detail-content">
+    <div class="container">
+
+      <!-- 로딩 -->
+      <div id="loading" style="text-align:center; padding:60px 0;">
+        <p>로딩 중...</p>
+      </div>
+
+      <!-- 권한 없음 -->
+      <div id="noAccess" style="display:none;">
+        <div class="auth-wrapper">
+          <div class="auth-card" style="text-align:center;">
+            <div class="auth-notice auth-notice-error">
+              <strong>접근 권한이 없습니다.</strong> 관리자만 이용할 수 있습니다.
+            </div>
+            <a href="mypage.html" class="btn btn-outline auth-btn">마이페이지로 이동</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 관리자 콘텐츠 -->
+      <div id="adminContent" style="display:none;">
+
+        <!-- 탭 -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="pending">승인 대기 <span class="admin-tab-count" id="pendingCount">0</span></button>
+          <button class="admin-tab" data-tab="approved">승인 완료 <span class="admin-tab-count" id="approvedCount">0</span></button>
+          <button class="admin-tab" data-tab="rejected">거절 <span class="admin-tab-count" id="rejectedCount">0</span></button>
+          <button class="admin-tab" data-tab="all">전체 <span class="admin-tab-count" id="allCount">0</span></button>
+        </div>
+
+        <!-- 회원 목록 -->
+        <div id="memberList" class="admin-member-list"></div>
+
+        <!-- 빈 상태 -->
+        <div id="emptyState" class="admin-empty" style="display:none;">
+          <p>해당하는 회원이 없습니다.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/nav-auth.js"></script>
+
+  <script>
+    const loading = document.getElementById('loading');
+    const noAccess = document.getElementById('noAccess');
+    const adminContent = document.getElementById('adminContent');
+    const memberList = document.getElementById('memberList');
+    const emptyState = document.getElementById('emptyState');
+
+    let allUsers = [];
+    let currentTab = 'pending';
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) { location.href = 'login.html'; return; }
+
+      try {
+        // 관리자 확인
+        const myDoc = await db.collection('users').doc(user.uid).get();
+        if (!myDoc.exists || myDoc.data().role !== 'admin') {
+          loading.style.display = 'none';
+          noAccess.style.display = '';
+          return;
+        }
+
+        // 전체 회원 목록 로드
+        const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
+        allUsers = [];
+        snapshot.forEach(doc => {
+          allUsers.push({ id: doc.id, ...doc.data() });
+        });
+
+        loading.style.display = 'none';
+        adminContent.style.display = '';
+        updateCounts();
+        renderList();
+
+      } catch (e) {
+        console.error('관리자 페이지 로드 실패:', e);
+        loading.innerHTML = '<div class="auth-notice auth-notice-error"><strong>오류:</strong> ' + e.message + '</div>';
+      }
+    });
+
+    // 탭 전환
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentTab = tab.dataset.tab;
+        renderList();
+      });
+    });
+
+    function updateCounts() {
+      document.getElementById('pendingCount').textContent = allUsers.filter(u => u.status === 'pending').length;
+      document.getElementById('approvedCount').textContent = allUsers.filter(u => u.status === 'approved').length;
+      document.getElementById('rejectedCount').textContent = allUsers.filter(u => u.status === 'rejected').length;
+      document.getElementById('allCount').textContent = allUsers.length;
+    }
+
+    function renderList() {
+      const filtered = currentTab === 'all'
+        ? allUsers
+        : allUsers.filter(u => u.status === currentTab);
+
+      if (filtered.length === 0) {
+        memberList.innerHTML = '';
+        emptyState.style.display = '';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      memberList.innerHTML = filtered.map(user => {
+        const date = user.createdAt
+          ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ko-KR')
+          : '-';
+
+        const statusBadge = {
+          pending: '<span class="status-badge pending">승인 대기</span>',
+          approved: '<span class="status-badge approved">승인 완료</span>',
+          rejected: '<span class="status-badge rejected">거절</span>'
+        }[user.status] || '';
+
+        const actions = user.status === 'pending' ? `
+          <div class="admin-actions">
+            <button class="btn btn-primary admin-action-btn" onclick="updateStatus('${user.id}', 'approved')">승인</button>
+            <button class="btn btn-outline admin-action-btn admin-reject-btn" onclick="updateStatus('${user.id}', 'rejected')">거절</button>
+          </div>
+        ` : user.status === 'approved' ? `
+          <div class="admin-actions">
+            <button class="btn btn-outline admin-action-btn admin-reject-btn" onclick="updateStatus('${user.id}', 'rejected')">승인 취소</button>
+          </div>
+        ` : `
+          <div class="admin-actions">
+            <button class="btn btn-primary admin-action-btn" onclick="updateStatus('${user.id}', 'approved')">승인</button>
+          </div>
+        `;
+
+        return `
+          <div class="admin-member-card">
+            <div class="admin-member-info">
+              <div class="admin-member-header">
+                <strong class="admin-member-name">${user.name || '-'}</strong>
+                ${statusBadge}
+              </div>
+              <div class="admin-member-details">
+                <span>기수: ${user.batch || '-'}</span>
+                <span>연락처: ${user.phone || '-'}</span>
+                <span>이메일: ${user.email || '-'}</span>
+                <span>가입일: ${date}</span>
+              </div>
+            </div>
+            ${actions}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function updateStatus(userId, newStatus) {
+      const statusText = { approved: '승인', rejected: '거절' };
+      if (!confirm(`이 회원을 ${statusText[newStatus]}하시겠습니까?`)) return;
+
+      try {
+        await db.collection('users').doc(userId).update({ status: newStatus });
+
+        // 로컬 데이터 업데이트
+        const user = allUsers.find(u => u.id === userId);
+        if (user) user.status = newStatus;
+
+        updateCounts();
+        renderList();
+        alert(`${statusText[newStatus]} 처리되었습니다.`);
+      } catch (e) {
+        alert('처리 실패: ' + e.message);
+        console.error('상태 변경 실패:', e);
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이페이지 — 산악동호회 2026</title>
+  <link rel="icon" href="../images/favicon.jpg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="../index.html#hero" class="nav-logo"><img src="../images/icca-mc-logo.png" alt="산악동호회" style="height:40px;"></a>
+      <div class="nav-links">
+        <a href="../index.html#greeting">인사말</a>
+        <a href="../index.html#leaders">총동문회 인사말</a>
+        <a href="../index.html#executives">집행부</a>
+        <a href="../index.html#hiking">정기산행</a>
+        <a href="../index.html#hiking-results">산행결과</a>
+        <a href="../index.html#events">행사안내</a>
+        <a href="../index.html#event-results">행사결과</a>
+      </div>
+      <a href="login.html" class="nav-auth-btn" id="navAuthBtn">로그인</a>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <section class="detail-hero">
+    <div class="container">
+      <a href="../index.html" class="back-link">← 메인으로 돌아가기</a>
+      <h1 class="section-title" style="position:relative;z-index:2;">마이페이지</h1>
+      <p class="section-desc" style="position:relative;z-index:2;">내 정보 및 회원 상태 확인</p>
+    </div>
+  </section>
+
+  <section class="detail-content">
+    <div class="container">
+      <!-- 로딩 -->
+      <div id="loading" class="auth-wrapper">
+        <div class="auth-card" style="text-align:center; padding:60px 24px;">
+          <p>로딩 중...</p>
+        </div>
+      </div>
+
+      <!-- 프로필 카드 -->
+      <div id="profileSection" class="auth-wrapper" style="display:none;">
+        <div class="auth-card">
+          <h2 class="auth-title">내 정보</h2>
+
+          <div id="statusBanner" class="auth-notice"></div>
+
+          <div class="profile-info">
+            <div class="profile-row">
+              <span class="profile-label">이름</span>
+              <span class="profile-value" id="profileName">-</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">기수</span>
+              <span class="profile-value" id="profileBatch">-</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">이메일</span>
+              <span class="profile-value" id="profileEmail">-</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">연락처</span>
+              <span class="profile-value" id="profilePhone">-</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">가입일</span>
+              <span class="profile-value" id="profileDate">-</span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">회원 상태</span>
+              <span class="profile-value" id="profileStatus">-</span>
+            </div>
+          </div>
+
+          <div id="approvedMenu" class="mypage-menu" style="display:none;">
+            <h3>회원 서비스</h3>
+            <a href="board.html" class="mypage-menu-item">
+              <span>게시판</span>
+              <span class="card-arrow">→</span>
+            </a>
+          </div>
+
+          <div id="adminMenu" class="mypage-menu" style="display:none;">
+            <h3>관리자</h3>
+            <a href="admin.html" class="mypage-menu-item">
+              <span>회원 승인 관리</span>
+              <span class="card-arrow">→</span>
+            </a>
+          </div>
+
+          <button class="btn btn-outline auth-btn" id="logoutBtn" style="margin-top:32px;">로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/nav-auth.js"></script>
+  <script src="../js/auth.js"></script>
+
+  <script>
+    const loading = document.getElementById('loading');
+    const profileSection = document.getElementById('profileSection');
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        location.href = 'login.html';
+        return;
+      }
+
+      try {
+        console.log('사용자 UID:', user.uid);
+        const doc = await db.collection('users').doc(user.uid).get();
+        console.log('Firestore 문서 존재:', doc.exists);
+        const profile = doc.exists ? doc.data() : null;
+        console.log('프로필 데이터:', profile);
+
+        loading.style.display = 'none';
+        profileSection.style.display = '';
+
+        if (!profile) {
+          // Firestore에 프로필이 없는 경우 — 가입 시 저장 실패했을 수 있음
+          const statusBanner = document.getElementById('statusBanner');
+          statusBanner.innerHTML = '<strong>프로필 데이터가 없습니다.</strong> 가입 시 저장에 실패했을 수 있습니다. 아래 버튼을 눌러 프로필을 다시 생성해주세요.';
+          statusBanner.className = 'auth-notice auth-notice-warning';
+          document.getElementById('profileEmail').textContent = user.email || '-';
+
+          // 프로필 재생성 버튼 추가
+          const retryBtn = document.createElement('button');
+          retryBtn.className = 'btn btn-primary auth-btn';
+          retryBtn.style.marginTop = '16px';
+          retryBtn.textContent = '프로필 다시 생성';
+          retryBtn.addEventListener('click', async () => {
+            const name = prompt('이름을 입력해주세요:');
+            const batch = prompt('기수를 입력해주세요 (예: 25기):');
+            const phone = prompt('연락처를 입력해주세요:');
+            if (!name || !batch || !phone) { alert('모든 항목을 입력해주세요.'); return; }
+            try {
+              await db.collection('users').doc(user.uid).set({
+                email: user.email,
+                name, batch, phone,
+                status: 'pending',
+                role: 'member',
+                provider: 'email',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              });
+              alert('프로필이 생성되었습니다.');
+              location.reload();
+            } catch (err) {
+              alert('프로필 생성 실패: ' + err.message);
+              console.error('프로필 생성 실패:', err);
+            }
+          });
+          statusBanner.after(retryBtn);
+          return;
+        }
+
+        document.getElementById('profileName').textContent = profile.name || '-';
+        document.getElementById('profileBatch').textContent = profile.batch || '-';
+        document.getElementById('profileEmail').textContent = profile.email || user.email;
+        document.getElementById('profilePhone').textContent = profile.phone || '-';
+
+        if (profile.createdAt) {
+          const date = profile.createdAt.toDate();
+          document.getElementById('profileDate').textContent =
+            date.getFullYear() + '.' +
+            String(date.getMonth() + 1).padStart(2, '0') + '.' +
+            String(date.getDate()).padStart(2, '0');
+        }
+
+        const statusBanner = document.getElementById('statusBanner');
+        const statusEl = document.getElementById('profileStatus');
+
+        if (profile.status === 'approved') {
+          statusEl.innerHTML = '<span class="status-badge approved">승인 완료</span>';
+          statusBanner.innerHTML = '<strong>환영합니다!</strong> 모든 회원 서비스를 이용하실 수 있습니다.';
+          statusBanner.className = 'auth-notice auth-notice-success';
+          document.getElementById('approvedMenu').style.display = '';
+        }
+
+        // 관리자 메뉴 표시
+        if (profile.role === 'admin') {
+          document.getElementById('adminMenu').style.display = '';
+        }
+
+        if (profile.status === 'pending') {
+          statusEl.innerHTML = '<span class="status-badge pending">승인 대기</span>';
+          statusBanner.innerHTML = '<strong>승인 대기 중</strong>: 관리자가 총동문회 정회원 여부를 확인한 후 승인합니다. 잠시만 기다려주세요.';
+          statusBanner.className = 'auth-notice auth-notice-warning';
+        } else if (profile.status === 'rejected') {
+          statusEl.innerHTML = '<span class="status-badge rejected">승인 거절</span>';
+          statusBanner.innerHTML = '<strong>승인이 거절되었습니다.</strong> 문의사항은 사무국장에게 연락해주세요.';
+          statusBanner.className = 'auth-notice auth-notice-error';
+        }
+      } catch (e) {
+        console.error('프로필 로드 실패:', e);
+        loading.style.display = 'none';
+        profileSection.style.display = '';
+        const statusBanner = document.getElementById('statusBanner');
+        statusBanner.innerHTML = '<strong>오류:</strong> ' + e.message + '<br>Firestore 보안 규칙이 올바르게 설정되었는지 확인해주세요.';
+        statusBanner.className = 'auth-notice auth-notice-error';
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await auth.signOut();
+      location.href = '../index.html';
+    });
+  </script>
+
+</body>
+</html>
