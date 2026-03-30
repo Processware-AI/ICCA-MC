@@ -1253,7 +1253,7 @@ button { border: none; background: none; cursor: pointer; font: inherit; color: 
 
 /* ---------- DETAIL PAGE STYLES ---------- */
 .detail-hero {
-  padding: 120px 0 60px;
+  padding: 100px 0 36px;
   background: linear-gradient(180deg, #87CEEB 0%, #b8d4e8 30%, #d8edd4 60%, var(--color-bg) 100%);
   position: relative;
 }
@@ -1281,13 +1281,13 @@ button { border: none; background: none; cursor: pointer; font: inherit; color: 
 .back-link:hover { color: var(--color-accent); }
 
 .detail-content {
-  padding: 60px 0 120px;
-  min-height: 60vh;
+  padding: 36px 0 60px;
+  min-height: 40vh;
 }
 
 .detail-section {
-  margin-bottom: 64px;
-  padding-bottom: 64px;
+  margin-bottom: 40px;
+  padding-bottom: 40px;
   border-bottom: 1px solid var(--color-border);
   scroll-margin-top: 80px;
 }

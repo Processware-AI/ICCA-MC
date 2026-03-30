@@ -11,4 +11,12 @@
       sec.style.display = 'none';
     }
   });
+
+  /* 모든 자식 detail-section이 숨겨진 detail-content는 패딩 제거 */
+  document.querySelectorAll('.detail-content').forEach(function (content) {
+    var visible = content.querySelectorAll('.detail-section:not([style*="display: none"])');
+    if (!visible.length) {
+      content.style.display = 'none';
+    }
+  });
 })();
