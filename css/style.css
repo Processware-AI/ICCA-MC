@@ -159,6 +159,24 @@ button { border: none; background: none; cursor: pointer; font: inherit; color: 
   margin-bottom: 60px;
 }
 
+.hero-cta {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.hero-cta .btn {
+  font-size: 1rem;
+  padding: 14px 32px;
+}
+
+.hero-cta .btn-outline {
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+}
+
 .hero-scroll {
   display: flex;
   flex-direction: column;
