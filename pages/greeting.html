@@ -21,11 +21,12 @@
       <div class="nav-links">
         <a href="../index.html#greeting">인사말</a>
         <a href="../index.html#leaders">총동문회 인사말</a>
-        <a href="../index.html#executives">집행부</a>
         <a href="../index.html#hiking">정기산행</a>
         <a href="../index.html#hiking-results">산행결과</a>
         <a href="../index.html#events">행사안내</a>
         <a href="../index.html#event-results">행사결과</a>
+        <a href="../index.html#calendar">캘린더</a>
+        <a href="../index.html#executives">집행부</a>
       </div>
       <a href="login.html" class="nav-auth-btn" id="navAuthBtn">로그인</a>
       <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기">
@@ -44,43 +45,45 @@
 
   <section class="detail-content">
     <div class="container">
-      <div style="display:flex; gap:48px; align-items:flex-start; flex-wrap:wrap;">
-        <div style="flex-shrink:0; text-align:center;">
-          <div class="image-placeholder president" style="width:240px; height:240px; margin:0 auto 16px;">
-            <!-- 회장님 사진: src="../images/president.png" -->
-            <img src="../images/president.png" alt="회장 프로필" onerror="this.style.display='none'">
-            <div class="placeholder-text">회장<br>사진</div>
+      <div class="detail-section" id="president">
+        <div style="display:flex; gap:48px; align-items:flex-start; flex-wrap:wrap;">
+          <div style="flex-shrink:0; text-align:center;">
+            <div class="image-placeholder president" style="width:240px; height:240px; margin:0 auto 16px;">
+              <!-- 회장님 사진: src="../images/president.png" -->
+              <img src="../images/president.png" alt="회장 프로필" onerror="this.style.display='none'">
+              <div class="placeholder-text">회장<br>사진</div>
+            </div>
+            <span class="exec-role">2026 산악동호회 회장</span>
+            <h3 style="font-size:1.6rem; margin-top:8px;">최종식</h3>
           </div>
-          <span class="exec-role">2026 산악동호회 회장</span>
-          <h3 style="font-size:1.6rem; margin-top:8px;">최종식</h3>
-        </div>
-        <div style="flex:1; min-width:300px;">
-          <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
-            존경하는 인천상공회의소 CEO아카데미 총동문회 산악동호회 회원 여러분, 안녕하십니까.
-          </p>
-          <br>
-          <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
-            2026년 산악동호회 회장을 맡게 된 최종식입니다.
-            지난 한 해 동안 회원 여러분의 열정적인 참여와 성원 덕분에 산악동호회가 한층 더 성장할 수 있었습니다.
-            깊은 감사의 말씀을 드립니다.
-          </p>
-          <br>
-          <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
-            2026년에도 매월 정기산행을 비롯하여, 다양한 특별 행사를 준비하고 있습니다.
-            자연 속에서 함께 땀 흘리며 나누는 이야기와 우정이야말로
-            우리 동호회의 가장 큰 자산이라고 생각합니다.
-          </p>
-          <br>
-          <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
-            올 한 해도 회원 모두가 건강하시고,
-            산에서의 시간이 일상의 활력이 되시길 진심으로 바랍니다.
-            감사합니다.
-          </p>
-          <br>
-          <p style="text-align:right; color:var(--color-text); font-weight:600; font-size:1.05rem;">
-            2026년 1월<br>
-            산악동호회 회장 최종식 올림
-          </p>
+          <div style="flex:1; min-width:300px;">
+            <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
+              존경하는 인천상공회의소 CEO아카데미 총동문회 산악동호회 회원 여러분, 안녕하십니까.
+            </p>
+            <br>
+            <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
+              2026년 산악동호회 회장을 맡게 된 최종식입니다.
+              지난 한 해 동안 회원 여러분의 열정적인 참여와 성원 덕분에 산악동호회가 한층 더 성장할 수 있었습니다.
+              깊은 감사의 말씀을 드립니다.
+            </p>
+            <br>
+            <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
+              2026년에도 매월 정기산행을 비롯하여, 다양한 특별 행사를 준비하고 있습니다.
+              자연 속에서 함께 땀 흘리며 나누는 이야기와 우정이야말로
+              우리 동호회의 가장 큰 자산이라고 생각합니다.
+            </p>
+            <br>
+            <p style="color:var(--color-muted); line-height:2.2; font-size:1.05rem;">
+              올 한 해도 회원 모두가 건강하시고,
+              산에서의 시간이 일상의 활력이 되시길 진심으로 바랍니다.
+              감사합니다.
+            </p>
+            <br>
+            <p style="text-align:right; color:var(--color-text); font-weight:600; font-size:1.05rem;">
+              2026년 1월<br>
+              산악동호회 회장 최종식 올림
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -165,6 +168,7 @@
   </footer>
 
   <script src="../js/main.js"></script>
+  <script src="../js/detail-filter.js"></script>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>

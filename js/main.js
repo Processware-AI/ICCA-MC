@@ -234,3 +234,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+
+/* ---------- PERSON CARD TOGGLE ---------- */
+function togglePersonCard(header) {
+  var card = header.closest('.person-card');
+  card.classList.toggle('expanded');
+}
+
+/* ---------- REVIEW MESSAGE TOGGLE ---------- */
+document.addEventListener('click', function (e) {
+  var author = e.target.closest('.review-author');
+  if (!author) return;
+  var msg = author.closest('.review-message');
+  if (msg) msg.classList.toggle('expanded');
+});
