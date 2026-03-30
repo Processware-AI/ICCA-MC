@@ -1253,7 +1253,7 @@ button { border: none; background: none; cursor: pointer; font: inherit; color: 
 
 /* ---------- DETAIL PAGE STYLES ---------- */
 .detail-hero {
-  padding: 100px 0 36px;
+  padding: 80px 0 20px;
   background: linear-gradient(180deg, #87CEEB 0%, #b8d4e8 30%, #d8edd4 60%, var(--color-bg) 100%);
   position: relative;
 }
@@ -1264,7 +1264,7 @@ button { border: none; background: none; cursor: pointer; font: inherit; color: 
   bottom: 0;
   left: 0;
   right: 0;
-  height: 200px;
+  height: 100px;
   background: linear-gradient(to bottom, transparent, var(--color-bg));
 }
 
@@ -1274,25 +1274,24 @@ button { border: none; background: none; cursor: pointer; font: inherit; color: 
   gap: 8px;
   font-size: 0.85rem;
   color: var(--color-muted);
-  margin-bottom: 32px;
+  margin-bottom: 16px;
   transition: color var(--transition);
 }
 
 .back-link:hover { color: var(--color-accent); }
 
 .detail-content {
-  padding: 36px 0 60px;
-  min-height: 40vh;
+  padding: 24px 0 36px;
 }
 
 .detail-section {
-  margin-bottom: 40px;
-  padding-bottom: 40px;
+  margin-bottom: 32px;
+  padding-bottom: 32px;
   border-bottom: 1px solid var(--color-border);
   scroll-margin-top: 80px;
 }
 
-.detail-section:last-child { border-bottom: none; }
+.detail-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
 /* Finance Table */
 .finance-table {
