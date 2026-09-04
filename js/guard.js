@@ -4,27 +4,37 @@
 
 const Guard = {
   // 회원 전용 페이지 접근 제어
-  requireApproved(redirectUrl) {
+  async requireApproved(redirectUrl) {
     const loginUrl = redirectUrl || this._getLoginUrl();
 
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        alert('로그인이 필요합니다.');
-        location.href = loginUrl;
-        return;
-      }
+    const profile = await Auth.ready;
 
-      try {
-        const doc = await db.collection('users').doc(user.uid).get();
-        if (!doc.exists || doc.data().status !== 'approved') {
-          alert('승인된 회원만 이용할 수 있습니다.\n관리자 승인을 기다려주세요.');
-          location.href = loginUrl.replace('login.html', 'mypage.html');
-        }
-      } catch (e) {
-        console.error('권한 확인 실패:', e);
-        location.href = loginUrl;
-      }
-    });
+    if (!profile) {
+      alert('로그인이 필요합니다.');
+      location.href = loginUrl;
+      return false;
+    }
+
+    if (profile.status !== 'approved') {
+      alert('승인된 회원만 이용할 수 있습니다.\n관리자 승인을 기다려주세요.');
+      location.href = loginUrl.replace('login.html', 'mypage.html');
+      return false;
+    }
+
+    return true;
+  },
+
+  // 관리자 전용 페이지 접근 제어
+  async requireAdmin(redirectUrl) {
+    const ok = await this.requireApproved(redirectUrl);
+    if (!ok) return false;
+
+    if (!Auth.isAdmin()) {
+      alert('관리자만 이용할 수 있습니다.');
+      location.href = (redirectUrl || this._getLoginUrl()).replace('login.html', 'mypage.html');
+      return false;
+    }
+    return true;
   },
 
   // 로그인 페이지 경로 계산 (pages/ 하위인지 루트인지)

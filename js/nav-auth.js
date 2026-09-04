@@ -12,31 +12,13 @@
   const btn = document.getElementById('navAuthBtn');
   if (btn) btn.style.visibility = 'hidden';
 
-  auth.onAuthStateChanged(async (user) => {
+  Auth.onStateChange((user, profile) => {
     if (!btn) return;
 
-    if (user) {
-      // Firestore에서 승인 상태 확인
-      try {
-        const doc = await db.collection('users').doc(user.uid).get();
-        const profile = doc.exists ? doc.data() : null;
-
-        if (profile && profile.status === 'approved') {
-          btn.textContent = user.displayName || '마이페이지';
-          btn.href = mypageUrl;
-          btn.classList.add('logged-in');
-        } else {
-          // 승인되지 않은 사용자는 로그아웃 처리
-          await auth.signOut();
-          btn.textContent = '로그인';
-          btn.href = loginUrl;
-          btn.classList.remove('logged-in');
-        }
-      } catch (e) {
-        btn.textContent = '로그인';
-        btn.href = loginUrl;
-        btn.classList.remove('logged-in');
-      }
+    if (profile && profile.status === 'approved') {
+      btn.textContent = profile.name || '마이페이지';
+      btn.href = mypageUrl;
+      btn.classList.add('logged-in');
     } else {
       btn.textContent = '로그인';
       btn.href = loginUrl;

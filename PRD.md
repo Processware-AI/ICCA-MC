@@ -5,9 +5,9 @@
 인천상공회의소 CEO아카데미 총동문회 산악동호회의 2026년 운영을 위한 웹 서비스.
 메인 랜딩 페이지(회원/비회원 공용)와 관리자 앱(별도)으로 구성한다.
 
-- **프론트엔드 호스팅**: GitHub Pages (정적 사이트)
-- **백엔드**: Firebase Auth + Firestore (BaaS)
-- **기술 스택**: HTML/CSS/JS (프레임워크 없음), Firebase SDK (CDN compat)
+- **프론트엔드**: HTML/CSS/JS 정적 페이지 (프레임워크 없음)
+- **백엔드**: 로컬 Node.js(Express) REST API + SQLite (`node:sqlite` 내장 모듈)
+- **호스팅**: Node 서버가 API와 정적 사이트를 함께 서빙 (`npm start`). GitHub Pages 배포는 정적 콘텐츠 전용이며 회원 기능은 동작하지 않는다.
 
 ---
 
@@ -22,54 +22,65 @@
 
 ---
 
-## 3. Firestore 데이터 구조
+## 3. 데이터베이스 구조 (SQLite — data/icca.db)
 
-### 3.1 users 컬렉션
-```
-users/{uid}
-├── email: string
-├── name: string
-├── batch: string          // 기수 (예: "25기")
-├── phone: string
-├── photoUrl: string       // 프로필 사진 URL (Firebase Storage)
-├── status: string         // "pending" | "approved" | "rejected"
-├── role: string           // "member" | "admin"
-├── provider: string       // "email" | "kakao"
-└── createdAt: timestamp
-```
-
-### 3.2 greetings 컬렉션 (인사말 — Admin App에서 관리)
-```
-greetings/{docId}
-├── section: string        // "president" | "vice-president" | "auditor" | "alumni" | "trekking" | "secretary-general"
-├── role: string           // 직책명 (예: "2026 산악동호회 회장")
-├── name: string
-├── message: string
-├── photoUrl: string       // 프로필 사진 URL
-├── order: number          // 표시 순서
-└── updatedAt: timestamp
+### 3.1 users 테이블 (구현 완료)
+```sql
+CREATE TABLE users (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  email         TEXT NOT NULL COLLATE NOCASE UNIQUE,
+  password_hash TEXT NOT NULL,                    -- scrypt$<salt>$<hash>
+  name          TEXT NOT NULL,
+  batch         TEXT NOT NULL DEFAULT '',         -- 기수 (예: "25기")
+  phone         TEXT NOT NULL DEFAULT '',
+  photo_url     TEXT NOT NULL DEFAULT '',
+  status        TEXT NOT NULL DEFAULT 'pending',  -- pending | approved | rejected
+  role          TEXT NOT NULL DEFAULT 'member',   -- member | admin
+  provider      TEXT NOT NULL DEFAULT 'email',    -- email | kakao
+  created_at    TEXT NOT NULL,                    -- ISO 8601
+  updated_at    TEXT NOT NULL
+);
 ```
 
-### 3.3 executives 컬렉션 (집행부 — Admin App에서 관리)
-```
-executives/{docId}
-├── role: string           // 직책명 (예: "산악총대장")
-├── name: string
-├── message: string
-├── photoUrl: string
-├── order: number          // 표시 순서
-└── updatedAt: timestamp
+아래 3.2~3.4는 아직 구현되지 않은 예정 스키마다 (현재 해당 콘텐츠는 HTML에 하드코딩되어 있다).
+
+### 3.2 greetings 테이블 (인사말 — 구현 예정)
+```sql
+CREATE TABLE greetings (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  section    TEXT NOT NULL,   -- president | vice-president | auditor | alumni | trekking | secretary-general
+  role       TEXT NOT NULL,   -- 직책명 (예: "2026 산악동호회 회장")
+  name       TEXT NOT NULL,
+  message    TEXT NOT NULL DEFAULT '',
+  photo_url  TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
 ```
 
-### 3.4 posts 컬렉션 (게시판 — 구현 예정)
+### 3.3 executives 테이블 (집행부 — 구현 예정)
+```sql
+CREATE TABLE executives (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  role       TEXT NOT NULL,   -- 직책명 (예: "산악총대장")
+  name       TEXT NOT NULL,
+  message    TEXT NOT NULL DEFAULT '',
+  photo_url  TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
 ```
-posts/{postId}
-├── title: string
-├── content: string
-├── authorId: string       // uid
-├── authorName: string
-├── createdAt: timestamp
-└── updatedAt: timestamp
+
+### 3.4 posts 테이블 (게시판 — 구현 예정)
+```sql
+CREATE TABLE posts (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  title      TEXT NOT NULL,
+  content    TEXT NOT NULL,
+  author_id  INTEGER NOT NULL REFERENCES users(id),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
 ```
 
 ---
@@ -98,7 +109,8 @@ posts/{postId}
 | 이메일/비밀번호 회원가입 | pages/signup.html | 완료 |
 | 이메일/비밀번호 로그인 | pages/login.html | 완료 |
 | 카카오 로그인 | pages/login.html | 미구현 (버튼만 배치) |
-| 비밀번호 재설정 (이메일 발송) | pages/login.html | 완료 |
+| 비밀번호 초기화 (관리자가 임시 비밀번호 발급) | pages/admin.html | 완료 (메일 발송 대체) |
+| 비밀번호 변경 (로그인 상태) | `POST /api/auth/password` | API 완료, 화면 미구현 |
 | 로그아웃 | pages/mypage.html | 완료 |
 | 네비게이션 인증 상태 표시 (전 페이지) | js/nav-auth.js | 완료 |
 
@@ -107,7 +119,7 @@ posts/{postId}
 | 기능 | 페이지 | 상태 |
 |------|--------|------|
 | 마이페이지 (프로필 조회, 승인 상태 확인) | pages/mypage.html | 완료 |
-| 프로필 재생성 (가입 시 저장 실패 복구) | pages/mypage.html | 완료 |
+| 프로필 수정 (이름/기수/연락처) | `PATCH /api/me` | API 완료, 화면 미구현 |
 | 게시판 (글 목록, 작성, 상세, 수정, 삭제) | pages/board.html | 미구현 |
 | 행사 참석 신청 | — | 미구현 |
 | 회비 납부 | — | 미구현 |
@@ -127,7 +139,7 @@ posts/{postId}
 ### 5.1 회원 관리
 - [ ] 전체 회원 목록 (검색, 필터, 정렬)
 - [ ] 회원 상세 정보 조회/수정
-- [ ] 회원 프로필 사진 등록/변경/삭제 (Firebase Storage 사용)
+- [ ] 회원 프로필 사진 등록/변경/삭제 (서버 파일 업로드)
 - [ ] 회원 가입 승인/거절 (현재 admin.html 기능 이관)
 - [ ] 회원 역할 변경 (member ↔ admin)
 - [ ] 회원 강제 탈퇴
@@ -139,7 +151,7 @@ posts/{postId}
 - [ ] 총동문회 인사말 관리 (총동문회장, 총괄회장, 사무총장)
 - [ ] 집행부 구성원 관리 (추가/수정/삭제/순서변경)
   - 직책, 이름, 인사말, 프로필 사진
-- [ ] 인사말/집행부 데이터 DB 기반 관리 (현재 HTML 하드코딩 → Firestore)
+- [ ] 인사말/집행부 데이터 DB 기반 관리 (현재 HTML 하드코딩 → SQLite)
 
 ### 5.3 산행/행사 콘텐츠 관리
 - [ ] 정기산행 일정 등록/수정/삭제 (현재 HTML 하드코딩 → DB 기반)
@@ -171,32 +183,24 @@ posts/{postId}
 
 ---
 
-## 6. Firestore 보안 규칙 (현재)
+## 6. API 및 권한 (현재)
 
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
+세션은 `icca_session` HttpOnly 쿠키(HMAC 서명, 7일 만료)로 유지된다.
+비밀번호는 scrypt로 해시하며 평문이나 해시가 클라이언트로 나가지 않는다.
 
-    function isAdmin() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
+| 메서드 | 경로 | 권한 | 설명 |
+|--------|------|------|------|
+| GET | `/api/auth/me` | 누구나 | 현재 로그인 프로필 |
+| POST | `/api/auth/signup` | 누구나 | 가입 신청 (status: pending) |
+| POST | `/api/auth/login` | 누구나 | 로그인 — 승인 회원만 세션 발급 |
+| POST | `/api/auth/logout` | 누구나 | 로그아웃 |
+| POST | `/api/auth/password` | 로그인 | 비밀번호 변경 |
+| PATCH | `/api/me` | 로그인 | 이름/기수/연락처 수정 |
+| GET | `/api/admin/users` | 관리자 | 전체 회원 목록 |
+| PATCH | `/api/admin/users/:id` | 관리자 | 승인 상태 변경 (본인 계정 강등 불가) |
+| POST | `/api/admin/users/:id/reset-password` | 관리자 | 임시 비밀번호 발급 |
 
-    match /users/{userId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && isAdmin();
-      allow delete: if false;
-    }
-
-    match /posts/{postId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.authorId;
-    }
-  }
-}
-```
+권한 검사는 모두 서버(`server/auth.js`의 `requireLogin` / `requireApproved` / `requireAdmin`)에서 수행한다.
 
 ---
 
@@ -204,11 +208,13 @@ service cloud.firestore {
 
 | 항목 | 값 |
 |------|-----|
-| Firebase 프로젝트 ID | icca-mc |
-| Firebase Auth 도메인 | icca-mc.firebaseapp.com |
-| Firestore 리전 | asia-northeast3 (서울) |
-| Firebase SDK 버전 | 10.12.0 (compat CDN) |
+| 런타임 | Node.js 22.5 이상 (`node:sqlite` 내장 모듈 필요) |
+| 서버 프레임워크 | Express 4 (유일한 런타임 의존성) |
+| 데이터베이스 | SQLite — `data/icca.db` (WAL 모드) |
+| 비밀번호 해시 | scrypt (`node:crypto`) |
+| 세션 | HMAC-SHA256 서명 쿠키 `icca_session` (7일) |
 | 인증 방식 | 이메일/비밀번호 (카카오 추후 추가) |
+| 실행 | `npm install && npm start` → http://localhost:3000 |
+| 관리자 생성 | `npm run seed:admin -- <email> <password> [이름]` |
 | GitHub 저장소 | Processware-AI/ICCA-MC |
-| 배포 | GitHub Pages (main 브랜치) |
-| 개발 브랜치 | feature/auth (인증 기능) |
+| 배포 | GitHub Pages는 정적 콘텐츠만. 회원 기능은 Node 서버 필요 |

@@ -86,11 +86,9 @@
     </div>
   </section>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="../js/firebase-config.js"></script>
+  <!-- Local API (Express + SQLite) -->
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
   <script src="../js/nav-auth.js"></script>
 
   <script>
@@ -103,33 +101,32 @@
     let allUsers = [];
     let currentTab = 'pending';
 
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) { location.href = 'login.html'; return; }
+    function esc(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    Auth.ready.then(async (profile) => {
+      if (!profile) { location.href = 'login.html'; return; }
+
+      if (profile.role !== 'admin') {
+        loading.style.display = 'none';
+        noAccess.style.display = '';
+        return;
+      }
 
       try {
-        // 관리자 확인
-        const myDoc = await db.collection('users').doc(user.uid).get();
-        if (!myDoc.exists || myDoc.data().role !== 'admin') {
-          loading.style.display = 'none';
-          noAccess.style.display = '';
-          return;
-        }
-
-        // 전체 회원 목록 로드
-        const snapshot = await db.collection('users').orderBy('createdAt', 'desc').get();
-        allUsers = [];
-        snapshot.forEach(doc => {
-          allUsers.push({ id: doc.id, ...doc.data() });
-        });
+        const data = await Api.listUsers();
+        allUsers = data.users;
 
         loading.style.display = 'none';
         adminContent.style.display = '';
         updateCounts();
         renderList();
-
       } catch (e) {
         console.error('관리자 페이지 로드 실패:', e);
-        loading.innerHTML = '<div class="auth-notice auth-notice-error"><strong>오류:</strong> ' + e.message + '</div>';
+        loading.innerHTML = '<div class="auth-notice auth-notice-error"><strong>오류:</strong> ' + esc(e.message) + '</div>';
       }
     });
 
@@ -164,7 +161,7 @@
       emptyState.style.display = 'none';
       memberList.innerHTML = filtered.map(user => {
         const date = user.createdAt
-          ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ko-KR')
+          ? new Date(user.createdAt).toLocaleDateString('ko-KR')
           : '-';
 
         const statusBadge = {
@@ -173,36 +170,35 @@
           rejected: '<span class="status-badge rejected">거절</span>'
         }[user.status] || '';
 
-        const actions = user.status === 'pending' ? `
-          <div class="admin-actions">
-            <button class="btn btn-primary admin-action-btn" onclick="updateStatus('${user.id}', 'approved')">승인</button>
-            <button class="btn btn-outline admin-action-btn admin-reject-btn" onclick="updateStatus('${user.id}', 'rejected')">거절</button>
-          </div>
+        const statusButtons = user.status === 'pending' ? `
+            <button class="btn btn-primary admin-action-btn" onclick="updateStatus(${user.id}, 'approved')">승인</button>
+            <button class="btn btn-outline admin-action-btn admin-reject-btn" onclick="updateStatus(${user.id}, 'rejected')">거절</button>
         ` : user.status === 'approved' ? `
-          <div class="admin-actions">
-            <button class="btn btn-outline admin-action-btn admin-reject-btn" onclick="updateStatus('${user.id}', 'rejected')">승인 취소</button>
-          </div>
+            <button class="btn btn-outline admin-action-btn admin-reject-btn" onclick="updateStatus(${user.id}, 'rejected')">승인 취소</button>
         ` : `
-          <div class="admin-actions">
-            <button class="btn btn-primary admin-action-btn" onclick="updateStatus('${user.id}', 'approved')">승인</button>
-          </div>
+            <button class="btn btn-primary admin-action-btn" onclick="updateStatus(${user.id}, 'approved')">승인</button>
         `;
+
+        const roleLabel = user.role === 'admin' ? ' <span class="status-badge approved">관리자</span>' : '';
 
         return `
           <div class="admin-member-card">
             <div class="admin-member-info">
               <div class="admin-member-header">
-                <strong class="admin-member-name">${user.name || '-'}</strong>
-                ${statusBadge}
+                <strong class="admin-member-name">${esc(user.name) || '-'}</strong>
+                ${statusBadge}${roleLabel}
               </div>
               <div class="admin-member-details">
-                <span>기수: ${user.batch || '-'}</span>
-                <span>연락처: ${user.phone || '-'}</span>
-                <span>이메일: ${user.email || '-'}</span>
-                <span>가입일: ${date}</span>
+                <span>기수: ${esc(user.batch) || '-'}</span>
+                <span>연락처: ${esc(user.phone) || '-'}</span>
+                <span>이메일: ${esc(user.email) || '-'}</span>
+                <span>가입일: ${esc(date)}</span>
               </div>
             </div>
-            ${actions}
+            <div class="admin-actions">
+              ${statusButtons}
+              <button class="btn btn-outline admin-action-btn" onclick="resetPassword(${user.id})">비밀번호 초기화</button>
+            </div>
           </div>
         `;
       }).join('');
@@ -213,11 +209,11 @@
       if (!confirm(`이 회원을 ${statusText[newStatus]}하시겠습니까?`)) return;
 
       try {
-        await db.collection('users').doc(userId).update({ status: newStatus });
+        const data = await Api.setUserStatus(userId, newStatus);
 
         // 로컬 데이터 업데이트
-        const user = allUsers.find(u => u.id === userId);
-        if (user) user.status = newStatus;
+        const idx = allUsers.findIndex(u => u.id === userId);
+        if (idx >= 0) allUsers[idx] = data.user;
 
         updateCounts();
         renderList();
@@ -225,6 +221,20 @@
       } catch (e) {
         alert('처리 실패: ' + e.message);
         console.error('상태 변경 실패:', e);
+      }
+    }
+
+    // 비밀번호 재설정 메일 대신 임시 비밀번호를 발급해 회원에게 전달한다
+    async function resetPassword(userId) {
+      const user = allUsers.find(u => u.id === userId);
+      if (!confirm(`${user ? user.name : '이 회원'}의 비밀번호를 임시 비밀번호로 초기화하시겠습니까?`)) return;
+
+      try {
+        const data = await Api.resetUserPassword(userId);
+        prompt('임시 비밀번호입니다. 회원에게 전달해주세요.', data.tempPassword);
+      } catch (e) {
+        alert('초기화 실패: ' + e.message);
+        console.error('비밀번호 초기화 실패:', e);
       }
     }
   </script>

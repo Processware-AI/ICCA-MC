@@ -1,108 +1,98 @@
 /* ============================================
    Authentication Logic
+   로컬 API(/api/auth/*) 기반 세션 인증.
    ============================================ */
 
 const Auth = {
-  // 현재 사용자 정보 (Firestore 프로필 포함)
+  // 현재 사용자 프로필 (비로그인 시 null)
   currentUser: null,
   currentProfile: null,
+
+  // 최초 세션 확인이 끝나면 resolve 되는 Promise
+  ready: null,
+
+  _resolved: false,
   _listeners: [],
 
-  // 인증 상태 변경 리스너
   init() {
-    auth.onAuthStateChanged(async (user) => {
-      this.currentUser = user;
-      if (user) {
-        await this._loadProfile(user.uid);
-      } else {
-        this.currentProfile = null;
-      }
-      this._notify();
-    });
+    this.ready = this._refresh();
+    return this.ready;
   },
 
-  // Firestore에서 사용자 프로필 로드
-  async _loadProfile(uid) {
+  // 서버에서 현재 세션 상태를 다시 읽어온다
+  async _refresh() {
     try {
-      const doc = await db.collection('users').doc(uid).get();
-      this.currentProfile = doc.exists ? doc.data() : null;
+      const data = await Api.me();
+      this.currentProfile = data.user || null;
     } catch (e) {
-      console.error('프로필 로드 실패:', e);
+      console.error('세션 확인 실패:', e);
       this.currentProfile = null;
     }
+    this.currentUser = this.currentProfile;
+    this._resolved = true;
+    this._notify();
+    return this.currentProfile;
   },
 
-  // 상태 변경 콜백 등록
+  // 상태 변경 콜백 등록 — 이미 확인이 끝났다면 즉시 1회 호출
   onStateChange(callback) {
     this._listeners.push(callback);
+    if (this._resolved) callback(this.currentUser, this.currentProfile);
   },
 
   _notify() {
-    this._listeners.forEach(fn => fn(this.currentUser, this.currentProfile));
-  },
-
-  // 이메일/비밀번호 회원가입 (가입 후 즉시 로그아웃)
-  async signup({ email, password, name, batch, phone }) {
-    const credential = await auth.createUserWithEmailAndPassword(email, password);
-    const uid = credential.user.uid;
-
-    await db.collection('users').doc(uid).set({
-      email,
-      name,
-      batch,
-      phone,
-      status: 'pending',   // pending | approved | rejected
-      role: 'member',       // member | admin
-      provider: 'email',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    this._listeners.forEach(fn => {
+      try {
+        fn(this.currentUser, this.currentProfile);
+      } catch (e) {
+        console.error(e);
+      }
     });
-
-    await credential.user.updateProfile({ displayName: name });
-
-    // 가입 후 즉시 로그아웃 — 관리자 승인 전까지 로그인 불가
-    await auth.signOut();
   },
 
-  // 이메일/비밀번호 로그인 (승인된 회원만 허용)
+  // 회원가입 — 서버에 status: 'pending'으로 저장되며 로그인 상태는 되지 않는다
+  async signup({ email, password, name, batch, phone }) {
+    await Api.signup({ email, password, name, batch, phone });
+  },
+
+  // 로그인 — 승인된 회원만 세션을 발급받는다
   async login(email, password) {
-    const credential = await auth.signInWithEmailAndPassword(email, password);
-    const uid = credential.user.uid;
-
-    // Firestore에서 승인 상태 확인
-    const doc = await db.collection('users').doc(uid).get();
-    const profile = doc.exists ? doc.data() : null;
-
-    if (!profile || profile.status !== 'approved') {
-      // 승인되지 않은 회원은 즉시 로그아웃
-      await auth.signOut();
-      const statusMsg = {
-        pending: '관리자 승인을 기다리고 있습니다.\n승인 후 로그인할 수 있습니다.',
-        rejected: '가입이 거절되었습니다.\n문의사항은 사무국장에게 연락해주세요.'
-      };
-      throw { code: 'auth/not-approved', message: statusMsg[profile?.status] || '회원 정보를 찾을 수 없습니다.' };
-    }
-
-    await this._loadProfile(uid);
+    const data = await Api.login(email, password);
+    this.currentProfile = data.user;
+    this.currentUser = data.user;
+    this._resolved = true;
     this._notify();
-    return credential.user;
+    return data.user;
   },
 
-  // 로그아웃
   async logout() {
-    await auth.signOut();
+    try {
+      await Api.logout();
+    } finally {
+      this.currentProfile = null;
+      this.currentUser = null;
+      this._notify();
+    }
   },
 
-  // 승인된 회원인지 확인
+  // 프로필 다시 읽기 (마이페이지 수정 후 등)
+  refresh() {
+    this.ready = this._refresh();
+    return this.ready;
+  },
+
   isApproved() {
-    return this.currentProfile && this.currentProfile.status === 'approved';
+    return !!this.currentProfile && this.currentProfile.status === 'approved';
   },
 
-  // 로그인 상태인지 확인
   isLoggedIn() {
     return !!this.currentUser;
   },
 
-  // 상태 텍스트
+  isAdmin() {
+    return !!this.currentProfile && this.currentProfile.role === 'admin';
+  },
+
   getStatusText() {
     if (!this.currentProfile) return '';
     const map = {

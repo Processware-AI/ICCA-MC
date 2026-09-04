@@ -108,120 +108,63 @@
     </div>
   </section>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="../js/firebase-config.js"></script>
-  <script src="../js/nav-auth.js"></script>
+  <!-- Local API (Express + SQLite) -->
+  <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/nav-auth.js"></script>
 
   <script>
     const loading = document.getElementById('loading');
     const profileSection = document.getElementById('profileSection');
 
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
+    Auth.ready.then((profile) => {
+      if (!profile) {
         location.href = 'login.html';
         return;
       }
 
-      try {
-        console.log('사용자 UID:', user.uid);
-        const doc = await db.collection('users').doc(user.uid).get();
-        console.log('Firestore 문서 존재:', doc.exists);
-        const profile = doc.exists ? doc.data() : null;
-        console.log('프로필 데이터:', profile);
+      loading.style.display = 'none';
+      profileSection.style.display = '';
 
-        loading.style.display = 'none';
-        profileSection.style.display = '';
+      document.getElementById('profileName').textContent = profile.name || '-';
+      document.getElementById('profileBatch').textContent = profile.batch || '-';
+      document.getElementById('profileEmail').textContent = profile.email || '-';
+      document.getElementById('profilePhone').textContent = profile.phone || '-';
 
-        if (!profile) {
-          // Firestore에 프로필이 없는 경우 — 가입 시 저장 실패했을 수 있음
-          const statusBanner = document.getElementById('statusBanner');
-          statusBanner.innerHTML = '<strong>프로필 데이터가 없습니다.</strong> 가입 시 저장에 실패했을 수 있습니다. 아래 버튼을 눌러 프로필을 다시 생성해주세요.';
-          statusBanner.className = 'auth-notice auth-notice-warning';
-          document.getElementById('profileEmail').textContent = user.email || '-';
+      if (profile.createdAt) {
+        const date = new Date(profile.createdAt);
+        document.getElementById('profileDate').textContent =
+          date.getFullYear() + '.' +
+          String(date.getMonth() + 1).padStart(2, '0') + '.' +
+          String(date.getDate()).padStart(2, '0');
+      }
 
-          // 프로필 재생성 버튼 추가
-          const retryBtn = document.createElement('button');
-          retryBtn.className = 'btn btn-primary auth-btn';
-          retryBtn.style.marginTop = '16px';
-          retryBtn.textContent = '프로필 다시 생성';
-          retryBtn.addEventListener('click', async () => {
-            const name = prompt('이름을 입력해주세요:');
-            const batch = prompt('기수를 입력해주세요 (예: 25기):');
-            const phone = prompt('연락처를 입력해주세요:');
-            if (!name || !batch || !phone) { alert('모든 항목을 입력해주세요.'); return; }
-            try {
-              await db.collection('users').doc(user.uid).set({
-                email: user.email,
-                name, batch, phone,
-                status: 'pending',
-                role: 'member',
-                provider: 'email',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-              });
-              alert('프로필이 생성되었습니다.');
-              location.reload();
-            } catch (err) {
-              alert('프로필 생성 실패: ' + err.message);
-              console.error('프로필 생성 실패:', err);
-            }
-          });
-          statusBanner.after(retryBtn);
-          return;
-        }
+      const statusBanner = document.getElementById('statusBanner');
+      const statusEl = document.getElementById('profileStatus');
 
-        document.getElementById('profileName').textContent = profile.name || '-';
-        document.getElementById('profileBatch').textContent = profile.batch || '-';
-        document.getElementById('profileEmail').textContent = profile.email || user.email;
-        document.getElementById('profilePhone').textContent = profile.phone || '-';
-
-        if (profile.createdAt) {
-          const date = profile.createdAt.toDate();
-          document.getElementById('profileDate').textContent =
-            date.getFullYear() + '.' +
-            String(date.getMonth() + 1).padStart(2, '0') + '.' +
-            String(date.getDate()).padStart(2, '0');
-        }
-
-        const statusBanner = document.getElementById('statusBanner');
-        const statusEl = document.getElementById('profileStatus');
-
-        if (profile.status === 'approved') {
-          statusEl.innerHTML = '<span class="status-badge approved">승인 완료</span>';
-          statusBanner.innerHTML = '<strong>환영합니다!</strong> 모든 회원 서비스를 이용하실 수 있습니다.';
-          statusBanner.className = 'auth-notice auth-notice-success';
-          document.getElementById('approvedMenu').style.display = '';
-        }
-
-        // 관리자 메뉴 표시
-        if (profile.role === 'admin') {
-          document.getElementById('adminMenu').style.display = '';
-        }
-
-        if (profile.status === 'pending') {
-          statusEl.innerHTML = '<span class="status-badge pending">승인 대기</span>';
-          statusBanner.innerHTML = '<strong>승인 대기 중</strong>: 관리자가 총동문회 정회원 여부를 확인한 후 승인합니다. 잠시만 기다려주세요.';
-          statusBanner.className = 'auth-notice auth-notice-warning';
-        } else if (profile.status === 'rejected') {
-          statusEl.innerHTML = '<span class="status-badge rejected">승인 거절</span>';
-          statusBanner.innerHTML = '<strong>승인이 거절되었습니다.</strong> 문의사항은 사무국장에게 연락해주세요.';
-          statusBanner.className = 'auth-notice auth-notice-error';
-        }
-      } catch (e) {
-        console.error('프로필 로드 실패:', e);
-        loading.style.display = 'none';
-        profileSection.style.display = '';
-        const statusBanner = document.getElementById('statusBanner');
-        statusBanner.innerHTML = '<strong>오류:</strong> ' + e.message + '<br>Firestore 보안 규칙이 올바르게 설정되었는지 확인해주세요.';
+      if (profile.status === 'approved') {
+        statusEl.innerHTML = '<span class="status-badge approved">승인 완료</span>';
+        statusBanner.innerHTML = '<strong>환영합니다!</strong> 모든 회원 서비스를 이용하실 수 있습니다.';
+        statusBanner.className = 'auth-notice auth-notice-success';
+        document.getElementById('approvedMenu').style.display = '';
+      } else if (profile.status === 'pending') {
+        statusEl.innerHTML = '<span class="status-badge pending">승인 대기</span>';
+        statusBanner.innerHTML = '<strong>승인 대기 중</strong>: 관리자가 총동문회 정회원 여부를 확인한 후 승인합니다. 잠시만 기다려주세요.';
+        statusBanner.className = 'auth-notice auth-notice-warning';
+      } else if (profile.status === 'rejected') {
+        statusEl.innerHTML = '<span class="status-badge rejected">승인 거절</span>';
+        statusBanner.innerHTML = '<strong>승인이 거절되었습니다.</strong> 문의사항은 사무국장에게 연락해주세요.';
         statusBanner.className = 'auth-notice auth-notice-error';
+      }
+
+      // 관리자 메뉴 표시
+      if (profile.role === 'admin') {
+        document.getElementById('adminMenu').style.display = '';
       }
     });
 
     document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await auth.signOut();
+      await Auth.logout();
       location.href = '../index.html';
     });
   </script>

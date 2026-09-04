@@ -81,13 +81,10 @@
     </div>
   </section>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="../js/firebase-config.js"></script>
-  <script src="../js/nav-auth.js"></script>
+  <!-- Local API (Express + SQLite) -->
+  <script src="../js/api.js"></script>
   <script src="../js/auth.js"></script>
+  <script src="../js/nav-auth.js"></script>
 
   <script>
     const loginForm = document.getElementById('loginForm');
@@ -113,38 +110,22 @@
         await Auth.login(email, password);
         location.href = 'mypage.html';
       } catch (err) {
-        if (err.code === 'auth/not-approved') {
-          showError(err.message);
-        } else {
-          const messages = {
-            'auth/user-not-found': '등록되지 않은 이메일입니다.',
-            'auth/wrong-password': '비밀번호가 올바르지 않습니다.',
-            'auth/invalid-email': '이메일 형식이 올바르지 않습니다.',
-            'auth/too-many-requests': '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.',
-            'auth/invalid-credential': '이메일 또는 비밀번호가 올바르지 않습니다.'
-          };
-          showError(messages[err.code] || '로그인에 실패했습니다: ' + err.message);
-        }
+        // not-approved / network-error 는 서버가 보낸 안내 문구를 그대로 노출
+        const messages = {
+          'invalid-credential': '이메일 또는 비밀번호가 올바르지 않습니다.',
+          'invalid-email': '이메일 형식이 올바르지 않습니다.'
+        };
+        showError(messages[err.code] || err.message || '로그인에 실패했습니다.');
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = '로그인';
       }
     });
 
-    // 비밀번호 재설정
-    document.getElementById('resetPwLink').addEventListener('click', async (e) => {
+    // 비밀번호 재설정 — 로컬 서버에는 메일 발송 기능이 없어 관리자가 임시 비밀번호를 발급한다
+    document.getElementById('resetPwLink').addEventListener('click', (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      if (!email) {
-        showError('비밀번호를 찾으려면 이메일을 먼저 입력해주세요.');
-        return;
-      }
-      try {
-        await auth.sendPasswordResetEmail(email);
-        alert('비밀번호 재설정 이메일을 발송했습니다.\n이메일을 확인해주세요.');
-      } catch (err) {
-        showError('비밀번호 재설정 이메일 발송에 실패했습니다.');
-      }
+      alert('비밀번호를 잊으셨다면 사무국장(관리자)에게 요청해주세요.\n관리자 페이지에서 임시 비밀번호를 발급해 드립니다.');
     });
 
     // 카카오 로그인 (추후 구현)
@@ -152,21 +133,9 @@
       alert('카카오 로그인은 준비 중입니다.');
     });
 
-    // 이미 로그인 상태 + 승인 회원이면 마이페이지로 이동
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          const doc = await db.collection('users').doc(user.uid).get();
-          if (doc.exists && doc.data().status === 'approved') {
-            location.href = 'mypage.html';
-          } else {
-            // 승인 안된 상태면 로그아웃
-            await auth.signOut();
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
+    // 이미 로그인 상태면 마이페이지로 이동
+    Auth.ready.then((profile) => {
+      if (profile) location.href = 'mypage.html';
     });
   </script>
 
