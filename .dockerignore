@@ -1,0 +1,20 @@
+node_modules
+npm-debug.log
+
+# DB와 세션 키는 이미지에 굽지 않고 볼륨으로 관리한다
+data
+
+.git
+.github
+.gitignore
+
+*.log
+.env
+
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+CLAUDE.md
+PRD.md

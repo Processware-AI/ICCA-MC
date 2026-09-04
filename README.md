@@ -7,6 +7,61 @@ HTML/CSS/JS 정적 페이지 + 로컬 **Express + SQLite** API 서버로 동작�
 
 ## 실행 방법
 
+### Docker (권장)
+
+```bash
+docker compose up -d --build           # http://localhost:3000
+HOST_PORT=8080 docker compose up -d    # 다른 포트로 띄우기
+```
+
+관리자 계정 생성:
+
+```bash
+docker compose exec web npm run seed:admin -- admin@example.com 비밀번호 "홍길동" "20기" "010-0000-0000"
+```
+
+| 작업 | 명령 |
+|------|------|
+| 로그 보기 | `docker compose logs -f` |
+| 상태 확인 | `docker compose ps` (healthcheck 포함) |
+| 중지 | `docker compose down` |
+| 중지 + **데이터 삭제** | `docker compose down -v` |
+| 코드 변경 반영 | `docker compose up -d --build` (개발 모드는 아래 참고) |
+
+SQLite DB와 세션 키는 `icca-data` 볼륨에 저장되므로 컨테이너를 지우거나 다시 빌드해도 회원 데이터는 유지된다.
+호스트에서 DB 파일을 직접 다루고 싶으면 `docker-compose.yml`의 볼륨을 `./data:/app/data` 바인드 마운트로 바꾸면 된다.
+
+운영 시에는 `ICCA_SESSION_SECRET`을 고정값으로 지정하는 것을 권장한다(지정하지 않으면 볼륨에 자동 생성된다).
+HTTPS 리버스 프록시 뒤에 둘 경우 `ICCA_SECURE_COOKIE=1`.
+
+```bash
+# .env 파일 예시 (docker compose가 자동으로 읽는다)
+ICCA_SESSION_SECRET=충분히-긴-임의-문자열
+ICCA_SECURE_COOKIE=1
+HOST_PORT=8080
+```
+
+### 개발 모드 (콘텐츠 수정 즉시 반영)
+
+`docker-compose.override.yml`이 있으면 `docker compose`가 **자동으로** 함께 읽는다.
+정적 파일과 `server/`를 호스트에서 바인드 마운트하므로 재빌드 없이 수정이 반영된다.
+
+| 무엇을 고쳤나 | 필요한 작업 | 소요 |
+|---------------|-------------|------|
+| HTML / CSS / JS / 이미지 | 브라우저 새로고침 | 즉시 |
+| `server/` 코드 | `docker compose restart web` | 약 1초 |
+| `package.json` (의존성) | `docker compose up -d --build` | 약 7초 |
+
+`server/`는 `node --watch`로 실행되지만, **Windows 바인드 마운트에서는 파일 변경 이벤트가 컨테이너로 전달되지 않아 자동 재시작이 동작하지 않는다**(실측 확인). 위 표대로 `docker compose restart web`을 쓰면 된다. 리눅스/맥 호스트에서는 자동 재시작이 동작한다.
+
+배포처럼 오버라이드를 적용하고 싶지 않을 때는 베이스 파일만 명시한다:
+
+```bash
+docker compose -f docker-compose.yml up -d --build
+```
+
+### Node 직접 실행
+
 ```bash
 npm install          # express 설치 (SQLite는 Node 내장 node:sqlite 사용)
 npm start            # http://localhost:3000
@@ -101,6 +156,9 @@ server/auth.js        비밀번호 해시 · 세션 · 권한 미들웨어
 server/routes.js      REST API 라우트
 server/seed-admin.js  초기 관리자 생성 스크립트
 data/icca.db          SQLite 데이터 파일 (git 제외)
+Dockerfile                   컨테이너 이미지 (node:24-alpine)
+docker-compose.yml           컨테이너 실행 정의 + 데이터 볼륨
+docker-compose.override.yml  개발용 — 소스를 바인드 마운트해 재빌드 없이 반영
 ```
 
 ---
@@ -109,4 +167,5 @@ data/icca.db          SQLite 데이터 파일 (git 제외)
 
 `.github/workflows`의 GitHub Pages 배포는 **정적 콘텐츠 전용**이다.
 로그인·회원가입·관리자 승인은 API 서버가 필요하므로 GitHub Pages에서는 동작하지 않는다.
-회원 기능까지 쓰려면 이 저장소를 Node.js가 실행되는 서버(사내 PC, VPS 등)에 올려 `npm start`로 구동해야 한다.
+회원 기능까지 쓰려면 이 저장소를 Node.js 또는 Docker가 실행되는 서버(사내 PC, VPS 등)에 올려 구동해야 한다.
+Docker가 설치된 환경이라면 `docker compose up -d --build` 한 줄로 끝난다.

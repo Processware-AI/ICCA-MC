@@ -1,0 +1,26 @@
+services:
+  web:
+    build: .
+    image: icca-mc:latest
+    container_name: icca-mc
+    restart: unless-stopped
+
+    # 호스트 포트는 HOST_PORT로 바꿀 수 있다 (예: HOST_PORT=8080 docker compose up -d)
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+
+    environment:
+      # 지정하지 않으면 컨테이너 안에서 자동 생성되지만,
+      # 값을 고정해야 재배포 후에도 기존 로그인 세션이 유지된다.
+      ICCA_SESSION_SECRET: "${ICCA_SESSION_SECRET:-}"
+      # HTTPS(리버스 프록시 뒤)로 서비스할 때 1로 설정
+      ICCA_SECURE_COOKIE: "${ICCA_SECURE_COOKIE:-0}"
+
+    volumes:
+      # SQLite DB(icca.db)와 세션 키가 저장된다. 컨테이너를 지워도 데이터는 남는다.
+      - icca-data:/app/data
+      # 호스트에서 DB 파일을 직접 보고 싶으면 위 줄 대신 아래를 사용:
+      # - ./data:/app/data
+
+volumes:
+  icca-data:

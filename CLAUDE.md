@@ -27,6 +27,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `server/auth.js` — scrypt 비밀번호 해시, HMAC 서명 세션 쿠키(`icca_session`), 권한 미들웨어
 - `server/routes.js` — REST API
 - `server/seed-admin.js` — 초기 관리자 계정 생성 스크립트
+- `Dockerfile` / `docker-compose.yml` — 컨테이너 실행 (DB는 `icca-data` 볼륨에 유지)
+- `docker-compose.override.yml` — 개발용. 소스를 바인드 마운트해 재빌드 없이 반영
 - `users` 테이블: id, email, password_hash, name, batch, phone, photo_url, status(pending/approved/rejected), role(member/admin), provider, created_at, updated_at
 
 ### 인증 흐름
@@ -49,6 +51,26 @@ API 목록과 에러 코드는 `README.md` 참고.
 - **API 에러 처리**: `Api`가 던지는 에러는 `err.code`/`err.message`를 가진다. 페이지에서는 `err.code`로 분기하고, 서버가 준 안내 문구(`not-approved` 등)는 그대로 노출한다.
 
 ## Development
+
+### Docker (권장)
+
+```bash
+docker compose up -d --build                                  # http://localhost:3000
+docker compose exec web npm run seed:admin -- <email> <pw> "이름"
+docker compose logs -f
+docker compose down                                           # 중지 (데이터 유지)
+```
+
+이미지는 `node:24-alpine` 기반이며 DB/세션 키는 `icca-data` 볼륨(`/app/data`)에 저장된다. 별도 DB 컨테이너는 없다(SQLite 내장).
+`HOST_PORT`로 호스트 포트를, `ICCA_SESSION_SECRET`·`ICCA_SECURE_COOKIE`로 세션 동작을 조정한다.
+`HOST_PORT`는 셸 환경변수라 명령마다 지정해야 한다. 고정하려면 루트에 `.env` 파일로 둔다.
+
+**개발 모드**: `docker-compose.override.yml`이 자동 적용되어 정적 파일과 `server/`를 바인드 마운트한다.
+HTML/CSS/JS 수정은 새로고침만으로 반영되고, 서버 코드는 `docker compose restart web`(약 1초).
+`node --watch`를 걸어두었지만 Windows 바인드 마운트에서는 변경 이벤트가 전달되지 않아 자동 재시작은 동작하지 않는다.
+오버라이드를 빼고 배포용으로 띄우려면 `docker compose -f docker-compose.yml up -d --build`.
+
+### Node 직접 실행
 
 ```bash
 npm install                                    # express 설치
